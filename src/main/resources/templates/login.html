@@ -9,17 +9,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="/css/style.css">
   <meta charset="UTF-8">
-  <title>99olg | 로그인</title>
+  <title>항해99 블로그</title>
+
+  <script>
+    $(document).ready(function () {
+      usercheck();
+    })
+
+    function usercheck() {
+      $.ajax({
+        type: "GET",
+        url: "/api/usercheck",
+        success: function (response) {
+          let usercheck = response;
+          if (usercheck != ""){
+            window.location.replace("/")
+            alert("이미 로그인되었습니다'-')/")
+          }
+        }
+      });
+    }
+  </script>
+
 </head>
 <body>
 <div id="login-form">
   <div id="login-title">로그인</div>
-  <button id="login-kakao-btn" onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code'">
+  <button id="login-kakao-btn" onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=4b2641b3a6e5f8177d02f0c45b2dc0b2&redirect_uri=http://localhost:8080/user/kakao/callback&response_type=code'">
     카카오로 로그인하기
   </button>
   <button id="login-id-btn" onclick="location.href='/user/signup'">
     회원 가입하기
   </button>
+  <div th:if="${loginError}" class="alert alert-danger" role="alert">닉네임 또는 패스워드를 확인해주세요.</div>
   <form action="/user/login" method="post">
     <div class="login-id-label">아이디</div>
     <input type="text" name="username" class="login-input-box">
@@ -29,15 +51,6 @@
 
     <button id="login-id-submit">로그인</button>
   </form>
-  <div id="login-failed" style="display:none" class="alert alert-danger" role="alert">로그인에 실패하였습니다.</div>
 </div>
 </body>
-<script>
-  const href = location.href;
-  const queryString = href.substring(href.indexOf("?")+1)
-  if (queryString === 'error') {
-    const errorDiv = document.getElementById('login-failed');
-    errorDiv.style.display = 'block';
-  }
-</script>
 </html>

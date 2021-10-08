@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -33,27 +33,27 @@
                     for (let i = 0; i < response.length; i++) {
                         let post = response[i];
                         let id = post.id;
-                        let name = post.name;
+                        let username = post.username;
                         let title = post.title;
                         let contents = post.contents;
                         let modifiedAt = post.modifiedAt;
-                        addHTML(id, name, title, contents, modifiedAt);
+                        addHTML(id, username, title, contents, modifiedAt);
                     }
                 }
             });
         }
 
-        function addHTML(id, name, title, contents, modifiedAt) {
-            let tempHtml = makeMessage(id, name, title, contents, modifiedAt);
+        function addHTML(id, username, title, contents, modifiedAt) {
+            let tempHtml = makeMessage(id, username, title, contents, modifiedAt);
             $('#cards-box').append(tempHtml);
         }
 
-        function makeMessage(id, name, title, contents, modifiedAt) {
+        function makeMessage(id, username, title, contents, modifiedAt) {
             return `<a href="detail.html?id=${id}">
                         <div class="card">
                             <div class="metadata">
-                               <div id="${id}-name" class="name">
-                                   ${name}
+                               <div id="${id}-username" class="name">
+                                   ${username}
                                </div>
                                <div class="date">
                                    ${modifiedAt}
@@ -78,19 +78,15 @@
 
         function writePost() {
             let contents = $('#contents').val();
-            let name = $('#name').val();
             let title = $('#title').val();
             if (isValidContents(contents) == false) {
-                return;
-            }
-            if (isValidContents(name) == false) {
                 return;
             }
             if (isValidContents(title) == false) {
                 return;
             }
 
-            let data = {'title': title, 'name': name, 'contents': contents};
+            let data = {'title': title, 'contents': contents};
             $.ajax({
                 type: "POST",
                 url: "/api/board",
@@ -263,21 +259,22 @@
 <div class="background-header">
 </div>
 <div class="wrap">
+
     <div class="header">
-        <h2>항해99 블로그</h2>
-        <p>
+        <a sec:authorize="isAuthenticated()" id="logout-text" href="/user/logout">
+            로그아웃
+        </a>
+        <a sec:authorize="!isAuthenticated()" id="login-text" href="/user/login">
+            로그인
+        </a>
+        <a sec:authorize="!isAuthenticated()" id="signup-text" href="/user/signup">
+            회원가입
+        </a>
+        <h2>항해99 블로그<br><br>
+            <li sec:authorize="isAuthenticated()">
+                <span th:text="${username}"></span> 님,<br><br></li>
             오늘 하루는 어땠나요?
-        </p>
-    </div>
-
-    <div class="header" style="position:relative;">
-        <div id="header-title-login-user">
-            <span th:text="${username}"></span> 님
-        </div>
-
-        <form id="my_form" method="post" action="/user/logout">
-            <a id="logout-text" href="javascript:{}" onclick="document.getElementById('my_form').submit();">로그아웃</a>
-        </form>
+        </h2>
     </div>
 
     <div class="to-write">
@@ -302,7 +299,6 @@
                     <div class="area-write">
                         <div class="form-floating mb-3">
                             <input type="title" class="form-control" id="title" placeholder="제 목">
-                            <input type="name" class="form-control" id="name" placeholder="닉네임">
                         </div>
                         <textarea class="field" placeholder="공유하고 싶은 소식을 입력해주세요" name="contents" id="contents" cols="30"
                                   rows="10"></textarea>
